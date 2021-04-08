@@ -1,0 +1,66 @@
+[user]
+   name = "Bradley Strauss"
+   # add email here
+   email = bstrauss@everquote.com
+
+[core]
+  editor = emacsclient
+  excludesfile = ~/.gitignore_global
+  pager = cat  # turns off pager for all git commands; helpful for Emacs shell
+	
+[push]
+  default = tracking
+
+[merge]
+  # ff = only  # if this is a company requirement
+
+[color]
+  diff = auto
+  status = auto
+  branch = auto
+  ui = auto
+
+[format]
+  pretty = %Cred%h%Creset %Cgreen[%ar]%Creset (%an) %s
+
+[alias]
+  a = add
+  aa = add --all
+  ad = !git add --all && git diff --cached
+  bd = !sh -c 'git branch -D $1 && git push origin :$1' -
+  br = branch
+  c = commit -a
+  cm = commit -am
+  co = checkout
+  cv = commit -v
+  dc = diff --cached
+  df = diff
+  di = diff
+  dic = diff --cached
+  graph = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+  # Show files ignored by git:
+  ign = ls-files -o -i --exclude-standard
+  last = log -1 HEAD
+  lg = log -p
+  lr = log --pretty=raw
+  lol = log --graph --decorate --pretty=oneline --abbrev-commit
+  lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+  ls = ls-files
+  mdev = !git checkout dev && git merge @{-1}
+  out = log origin..HEAD
+  pl = pull
+  plre = pull --rebase
+  pr = remote prune origin
+  prdev = !hub pull-request -b dev
+  ps = push
+  rba = rebase --abort
+  rbc = rebase --continue
+  rbdev = !git fetch origin && git rebase origin/dev
+  rbi = rebase -i
+  rbidev = !git fetch origin && git rebase -i origin/dev
+  # Interactive rebase up to and including the common parent with another branch
+  rbi-parent = "!f() { git rebase -i $(git merge-base $1 $(git rev-parse --abbrev-ref HEAD))^; }; f"
+  rbs = rebase --skip
+  rv = remote -v
+  st = status
+  unstage = reset HEAD --

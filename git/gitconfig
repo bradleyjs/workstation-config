@@ -1,7 +1,7 @@
 [user]
    name = "Bradley Strauss"
    # add email here
-   email = bstrauss@everquote.com
+   email = ""
 
 [core]
   editor = emacsclient

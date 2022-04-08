@@ -2,6 +2,7 @@
    name = "Bradley Strauss"
    # add email here
    email = ""
+   singingkey = FF8657F6A86116D2
 
 [core]
   editor = emacsclient

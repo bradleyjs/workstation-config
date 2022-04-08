@@ -8,7 +8,10 @@
   editor = emacsclient
   excludesfile = ~/.gitignore_global
   pager = cat  # turns off pager for all git commands; helpful for Emacs shell
-	
+
+[commit]
+  gpgsign = true
+
 [push]
   default = tracking
 

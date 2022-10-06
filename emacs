@@ -41,7 +41,12 @@
   ;;   :ensure t
   ;;   :pin melpa)
 
-  (use-package elpy
+(use-package ein
+  :ensure t
+  :pin melpa
+ )
+
+(use-package elpy
     :ensure t
     :pin melpa-stable
     :config
@@ -153,8 +158,8 @@
 (setq show-paren-style 'expression)
 ;; ;; Enable automatic character pairing
 ;;(electric-pair-mode t)
-;; ;; Enable automatic indentation
-;;(electric-indent-mode t)
+;; Disable automatic indentation
+(electric-indent-mode nil)
 
 
 ;; Display column number as well as line number in status bar
@@ -313,6 +318,8 @@
 
 (setq org-mobile-directory "~/Dropbox/org/MobileOrg")
 
+
+
 ;; ;; ;; emacs-w3m for web browsing
 ;; ;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/w3m")
 ;; ;; (require 'w3m-load)
@@ -425,10 +432,15 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes '(tango))
+ '(electric-indent-mode nil)
+ '(elpy-modules
+   '(elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults))
  '(ledger-complete-in-steps t)
  '(ledger-highlight-xact-under-point nil)
  '(ledger-post-amount-alignment-at :decimal)
  '(ledger-post-amount-alignment-column 60)
+ '(org-adapt-indentation nil)
  '(package-selected-packages
    '(cl yaml-mode which-key w3m use-package markdown-mode magit ledger-mode go-mode ess enh-ruby-mode elpy ein bash-completion auto-complete auctex))
  '(tab-always-indent 'complete))

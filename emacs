@@ -6,90 +6,36 @@
 ;; Make any changes to the .org file and re-tangle (M-x org-babel-tangle).
 ;; -----------------------------------------------------------------------------
 
-  ;; Initialize the package system for Ensime:
-  (require 'package)
-  (setq
-   package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-		      ("org" . "http://orgmode.org/elpa/")
-                      ("melpa" . "http://melpa.org/packages/")
-		      ("melpa-stable" . "http://stable.melpa.org/packages/")))
-    ;;  (add-to-list 'package-archives
-    ;;  	     '("marmalade" . "http://marmalade-repo.org/packages/"))
-    ;; (add-to-list 'package-archives
-    ;; 	     '("melpa-stable" . "http://stable.melpa.org/packages/"))
+;; initialize the packaging system.  Note that package-initalize has
+;; to come before we change any variable values.
+(setq
+ package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+		    ("org" . "http://orgmode.org/elpa/")
+                    ("melpa" . "http://melpa.org/packages/")
+		    ("melpa-stable" . "http://stable.melpa.org/packages/")))
 
-    (package-initialize)
+(package-initialize)
+(when (not package-archive-contents)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
 
-    (when (not package-archive-contents)
-      (package-refresh-contents)
-      (package-install 'use-package))
-    (require 'use-package)
-
-;;  (use-package auctex
-;;    :ensure t
-;;    :pin gnu)
-
-  (use-package auto-complete
-    :ensure t
-    :pin melpa-stable)
-
-  (use-package bash-completion
-    :ensure t
-    :pin melpa-stable)
-
-  ;; (use-package cl
-  ;;   :ensure t
-  ;;   :pin melpa)
-
-(use-package ein
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (python-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp
   :ensure t
-  :pin melpa
- )
+  :pin melpa)
 
-(use-package elpy
-    :ensure t
-    :pin melpa-stable
-    :config
-    (delete ".\\highlight\\" elpy-modules))
-
-  ;;(use-package ensime
-  ;;	     :ensure t
-  ;;	     :pin melpa-stable)
-
-  (use-package ess
-    :ensure t
-    :pin melpa-stable)
-
-  (use-package magit
-    :ensure t
-    :pin melpa)
-
-  (use-package markdown-mode
-    :ensure t
-    :pin melpa-stable)
-
-  (use-package org
-      :ensure t
-      :pin org)
-
-  (use-package w3m
-    :ensure t
-    :pin melpa)
-
-  (use-package which-key
-    :ensure t
-    :pin melpa-stable)
-
-  (use-package yaml-mode
-    :ensure t
-    :pin melpa-stable
-    :config (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
-
-  ;; Add to emacs init
-  ;;(add-to-list 'load-path "~/.emacs.d/site-lisp/magit/lisp")
-  (require 'magit)
-  ;; auto-complete is manually installed to the site-lisp directory
-  (require 'auto-complete)
+(use-package lsp-ui
+  :commands lsp-ui-mode
+  :ensure t
+  :pin melpa)
 
 ;; Keybindings changes ;;
 ;; Magit
@@ -102,12 +48,10 @@
 ;; Ctrl sequence to invoke Meta.
 (global-set-key "\C-x\C-m" 'execute-extended-command)
 (global-set-key "\C-c\C-m" 'execute-extended-command)
-
 ;; Ctrl sequence to backward kill word.
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-k" 'kill-region)
 (global-set-key "\C-c\C-k" 'kill-region)
-
 ;; remap command-p (super-p) for Mac
 ;; see: http://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Binding-Commands.html
 (global-unset-key (kbd "s-p"))
@@ -120,35 +64,24 @@
 (global-set-key (kbd "<f9>") 'prev-window)
 (global-set-key (kbd "<f6>") 'delete-window)
 
-  ;; Turn off bell noises
-  (setq ring-bell-function #'ignore)
-  ;; Don't turn off the menu bar by default. As of Emacs 26.1 you have to do
-  ;; this for menus on OS X.
-  ;; (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-  (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-  (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+;; Turn off bell noises
+(setq ring-bell-function #'ignore)
+;; Turn off the menu bar.
+;; ;;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
-  (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
-
+;; Default fonts
 (let (my-system-font)
   (progn
-    (when (eq system-type 'cygwin)
-      (if (eq window-system 'x)
-	  (setq my-system-font "6x13"))
-      (if (eq window-system 'w32)
-	  (setq my-system-font "Consolas")))
-
     (when (eq system-type 'darwin )
       (if (eq window-system 'ns)
-	  (setq my-system-font "Menlo 24"))
+	  (setq my-system-font "Menlo 18"))
       (if (eq window-system 'x)
-	  (setq my-system-font "6x13")))
-
+	  (setq my-system-font "7x14")))
     (when (eq system-type 'gnu/linux)
       (setq my-system-font "6x13"))
-
-    (if my-system-font
-	(set-face-attribute 'default nil :font my-system-font))))
+    (set-face-attribute 'default nil :font my-system-font)))
 
 ;; ;; keep a list of recently opened files
 ;; (recentf-mode 1)
@@ -157,19 +90,16 @@
 (show-paren-mode t)
 (setq show-paren-style 'expression)
 ;; ;; Enable automatic character pairing
-;;(electric-pair-mode t)
-;; Disable automatic indentation
-(electric-indent-mode nil)
+;;(electric-pair-mode +1)
+;; ;; Enable automatic indentation
+;;(electric-indent-mode +1)
 
 
 ;; Display column number as well as line number in status bar
 (column-number-mode t)
 ;; Display time, day, and date in status bar
-(set-time-zone-rule "America/Los_Angeles")
 (setq display-time-day-and-date t)
 (display-time-mode t)
-;; Default fill line length
-(setq-default fill-column 75)
 
 ;; ;; ibuffer mode
 (defalias 'list-buffers 'ibuffer)
@@ -177,18 +107,33 @@
 ;; make buffer switch command show suggestions
 ;; (ido-mode 1)
 
-;; color themes
-;; (add-to-list 'custom-theme-load-path "~/projects/emacs-color-theme-solarized")
-;; (setq frame-background-mode (quote dark))
-(load-theme 'tango-dark t)
+;; ;; color themes
+(add-to-list 'custom-theme-load-path "~/emacs/emacs-color-theme-solarized")
+;; (load-theme 'solarized-light t)
 
-(add-to-list 'default-frame-alist '(height . 36))
-(add-to-list 'default-frame-alist '(width . 135))
+;; undo-tree globally
+;; default redo keys are C-? and M-_, undo are C-/ and C-_
+;;(require 'undo-tree)
+;;(global-undo-tree-mode t)
 
-;; Install auto-complete mode for ESS
-(require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories "~/elisp/dict")
-(ac-config-default)
+;; (add-to-list 'load-path "~/emacs/ess-13.09-1/lisp")
+;; (add-to-list 'load-path "~/elisp/ess-15.03-1/lisp")
+;; Polymode stuff
+;;(setq load-path
+;;      (append '("~/emacs/polymode/" "~/emacs/polymode/modes")
+;;	      load-path))
+;;(add-to-list 'Info-additional-directory-list "~/emacs/info")
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; Emacs and git integration ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; (if (eq system-type 'darwin)
+  ;;     (add-to-list 'load-path "/usr/local/share/git-core/contrib/emacs"))
+  ;; (if (eq system-type 'gnu/linux)
+  ;;     (add-to-list 'load-path "/usr/share/doc/git-core/contrib/emacs"))
+  ;; (require 'git)
+  ;; (require 'git-blame)
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ;; Emacs major modes  ;;
@@ -199,17 +144,14 @@
 (require 'dired-x)
 ;; Ignore dot files
 (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
-(when (eq system-type 'darwin)       
-  (setq dired-use-ls-dired nil))
 
-;; ESS for statistics
-(require 'ess-site)
-(setq ess-default-style 'RStudio)
+;; ;; ESS for statistics
+;; (require 'ess-site)
+;; ;;(require 'ess-jags-d)
 
 ;;
 ;; Org mode Stuff
 ;;
-(require 'org)
 
 ;;(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.org_archive\\'" . org-mode))
@@ -218,19 +160,13 @@
 ;; various org mode convenience features
 (setq org-insert-mode-line-in-empty-file t)
 ;; load agenda files
-(setq org-agenda-files (quote "~/Dropbox/org/agenda.org"))
+(setq org-agenda-files (quote ("~/Dropbox/org/swoop"
+			       "~/Dropbox/org/tasks.org")))
 ;; I don't like the deadline warnings; if I can't see them in week
 ;; view, no need to worry about them.
 (setq org-deadline-warning-days 0)
-
 ;; hide leading stars for cleaner look
-
-;; So that the leading headline stars are grey:
-(setq org-hide-leading-stars t)
-;; Note update to set both `foreground` and `distant-foreground`:
-(set-face-attribute 'org-hide nil :foreground "grey" :distant-foreground "grey")
-
-;; (setq org-hide t (:foreground "gray"))
+;;(setq org-hide-leading-stars t)
 ;; no colors for headline text
 (setq org-level-color-stars-only t)
 ;; turn on Org spped keys
@@ -239,12 +175,12 @@
 ;; org-agenda views
 (setq org-agenda-restore-windows-after-quit t)
 ;; The agenda should appear in a new frame
-(setq org-agenda-window-setup (quote current-window))
+(setq org-agenda-window-setup (quote other-frame))
 
 ;; Org mode keybindings
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
-(global-set-key "\C-cl" 'org-store-link)
+;; (global-set-key "\C-cl" 'org-store-link)
 
 ;; org-src settings
 (setq org-src-fontify-natively t)
@@ -278,21 +214,19 @@
 
 ;; org-tags-column sets the alignement for tags. Negative values
 ;; specify right alignment.
-(setq org-tags-column -80)
-(setq org-agenda-tags-column -130)
+(setq org-tags-column -100)
+(setq org-agenda-tags-column -120)
+
+(setq org-ditaa-jar-path "/Users/brad/emacs/org-8.2.6/contrib/scripts/ditaa.jar")
 
 ;; TODO state keywords configuration
 (setq org-todo-keywords
-      (quote ((sequence "TODO(t)"
-			"IN-PROGRESS(i)"
-			"|" "DONE(d)")
+      (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
 	      (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)"))))
 
 (setq org-todo-keyword-faces
       (quote (
-	      ("TODO" :foreground "darkgreen" :weight bold)
-	      ("IN-PROGRESS" :foreground "blue" :weight bold)
-	      ("DONE" :foreground "cyan" :weight bold))))
+	      ("NEXT" :foreground "#268bd2" :weight bold))))
 ;;
 
 ;; Enable logging timestamp when a task enters the DONE state
@@ -312,13 +246,49 @@
               ("HOLD" ("WAITING") ("HOLD" . t))
               (done ("WAITING") ("HOLD"))
               ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+              ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
               ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
 ;; enable Markdown export from org
 (add-to-list 'org-export-backends 'md)
 
-(setq org-mobile-directory "~/Dropbox/org/MobileOrg")
+;; auctex
+;; (load "~/emacs/site-lisp/auctex.el" nil t t)
+;; (load "~/emacs/site-lisp/preview-latex.el" nil t t)
+;; (load "auctex.el" nil t t)
+;; (load "preview.el" nil t t)
+(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+;; I like the sub and superscript help...
+(setq TeX-electric-sub-and-superscript t)
+;; but I don't like the smaller fonts.
+(setq font-latex-fontify-script nil)
+;; Reload doc view files automatically when updated; very useful for
+;; viewing changes in compiled LaTeX after recompiling.
+(add-hook 'doc-view-mode-hook 'auto-revert-mode)
+;; LaTeX files start in visual-line-mode by default
+;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+;; Turn on reftex
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+;; Integrate reftex with AUCTeX
+(setq reftex-plug-into-AUCTeX t)
+;; As of Emacs 24.1, bibtex-parse-buffers-steathily throws annoying
+;; bad argument errors. Not sure of the fix, so to work around it:
+(setq bibtex-parse-keys-timeout 86400)
 
+;; Markdown mode
+;; http://jblevins.org/projects/markdown-mode/
+(autoload 'markdown-mode "markdown-mode"
+  "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+;; (add-to-list 'auto-mode-alist '("\\.Rmd\\'" . markdown-mode))
 
+;; Polymode
+;; Edit a buffer using several major modes; particularly useful for Rmd files and knitr
+;;(require 'poly-R)
+;;(require 'poly-markdown)
+;;(require 'poly-js)
 
 ;; ;; ;; emacs-w3m for web browsing
 ;; ;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/w3m")
@@ -326,9 +296,14 @@
 ;; ;; ;; Use cookies so gmail works
 ;; ;; (setq w3m-use-cookies t)
 
-;; Tramp mode defaults
-(require 'tramp)
-(setq tramp-default-method "ssh")
+;; (add-to-list 'load-path
+;; 	     (expand-file-name "~/emacs/site-lisp/ledger/"))
+;; (load "ledger-mode")
+;; (add-to-list 'auto-mode-alist '("\\.ledger$" . ledger-mode))
+
+;; ;; Tramp mode defaults
+;; (require 'tramp)
+;; (setq tramp-default-method "ssh")
 
 (setq doc-view-continuous t)
 
@@ -358,16 +333,6 @@
 ;; For compliance with Swoop coding standards
 (setq js-indent-level 2)
 
-(setq sql-postgres-login-params
-      '((user :default "bstrauss")
-	(database :default "enterprisedatawarehouse")
-	(server :default "redshift.emdeon.net")
-	(port :default 5439)))
-
-(add-hook 'sql-interactive-mode-hook
-          (lambda ()
-            (toggle-truncate-lines t)))
-
   ;; ;; Start a shell running.
   ;;(shell)
   ;; ;; rename the shell to *shell_local*
@@ -375,15 +340,16 @@
 
 (setq confirm-kill-emacs (quote yes-or-no-p))
 
-;;(server-start)
+(setq insert-directory-program "gls")
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(fixed-pitch ((t (:family "Menlo"))))
- '(markdown-code-face ((t (:inherit fixed-pitch)))))
+(global-set-key (kbd "<s-M-wheel-up>") 'mouse-wheel-text-scale)
+(global-set-key (kbd "<s-M-wheel-down>") 'mouse-wheel-text-scale)
+
+(global-set-key (kbd "<pinch>") 'ignore)
+(global-set-key (kbd "<C-wheel-up>") 'ignore)
+(global-set-key (kbd "<C-wheel-down>") 'ignore)
+
+;;(server-start)
 
 ;; ;; (custom-set-variables
 ;; ;;  ;; custom-set-variables was added by Custom.
@@ -432,15 +398,21 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(tango))
- '(electric-indent-mode nil)
- '(elpy-modules
-   '(elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults))
- '(ledger-complete-in-steps t)
- '(ledger-highlight-xact-under-point nil)
- '(ledger-post-amount-alignment-at :decimal)
- '(ledger-post-amount-alignment-column 60)
- '(org-adapt-indentation nil)
+ '(copilot-chat-model "claude-sonnet-4")
+ '(ein:output-area-inlined-images t)
+ '(org-format-latex-options
+   '(:foreground default :background default :scale 1.5 :html-foreground
+		 "Black" :html-background "Transparent" :html-scale
+		 1.0 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
  '(package-selected-packages
-   '(cl yaml-mode which-key w3m use-package markdown-mode magit ledger-mode go-mode ess enh-ruby-mode elpy ein bash-completion auto-complete auctex))
- '(tab-always-indent 'complete))
+   '(auctex auto-complete bash-completion copilot-chat ein elpy
+	    emacsql-sqlite ess ledger-mode lsp-ui magit org-noter
+	    org-notifications org-roam-bibtex org-roam-ui pdf-tools
+	    terraform-mode treemacs use-package vterm w3m which-key
+	    yaml yaml-mode)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

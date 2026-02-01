@@ -4,7 +4,7 @@
    email = "817443+bradleyjs@users.noreply.github.com"
 #   singingkey = FF8657F6A86116D2
 
-[includeIf "gitdir:~/projects/slalom/"]
+[includeIf "gitdir:~/projects/slalom/**"]
     path = ~/.gitconfig-slalom
 
 [core]

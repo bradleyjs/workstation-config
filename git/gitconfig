@@ -1,16 +1,18 @@
+[gpg]
+  format = ssh
+
 [user]
-   name = "Bradley Strauss"
-   # add email here
-   email = ""
-   singingkey = FF8657F6A86116D2
+  name = "Bradley Strauss"
+  email = "817443+bradleyjs@users.noreply.github.com"
+  signingkey = /Users/brad/.ssh/id_ed25519.pub
+
+[commit]
+  gpgsign = true
 
 [core]
   editor = emacsclient
   excludesfile = ~/.gitignore_global
-  pager = cat  # turns off pager for all git commands; helpful for Emacs shell
-
-[commit]
-  gpgsign = true
+  pager = less  # turns off pager for all git commands; helpful for Emacs shell
 
 [push]
   default = tracking

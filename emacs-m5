@@ -153,6 +153,28 @@
 ;; Org mode Stuff
 ;;
 
+(setq org-startup-indented nil)
+;; ;; The nuclear option: uncomment this line to force org-indent-mode
+;; ;; off every time an org buffer opens
+;; (add-hook 'org-mode-hook (lambda () (org-indent-mode -1)))
+
+;; Restore the behavior where text automatically inserts physical
+;; spaces to line up with the headline text.
+(setq org-adapt-indentation t)
+
+(defun my/fix-org-indent-behavior ()
+  ;; 1. Disable electric-indent-mode so RET is just a newline
+  (electric-indent-local-mode -1)
+  
+  ;; 2. Bind C-j to the new equivalent of the obsolete command
+  ;; We wrap (org-return t) in a lambda so it can be used as a keybinding
+  (local-set-key (kbd "C-j") (lambda () (interactive) (org-return t)))
+
+  ;; 3. Enable visual line mode (soft word wrapping)
+  (visual-line-mode 1))
+
+(add-hook 'org-mode-hook 'my/fix-org-indent-behavior)
+
 ;;(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.org_archive\\'" . org-mode))
 
@@ -160,8 +182,7 @@
 ;; various org mode convenience features
 (setq org-insert-mode-line-in-empty-file t)
 ;; load agenda files
-(setq org-agenda-files (quote ("~/Dropbox/org/swoop"
-			       "~/Dropbox/org/tasks.org")))
+(setq org-agenda-files (quote ("~/Dropbox/org/today.org")))
 ;; I don't like the deadline warnings; if I can't see them in week
 ;; view, no need to worry about them.
 (setq org-deadline-warning-days 0)

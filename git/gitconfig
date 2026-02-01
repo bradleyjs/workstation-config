@@ -1,8 +1,11 @@
 [user]
    name = "Bradley Strauss"
    # add email here
-   email = ""
-   singingkey = FF8657F6A86116D2
+   email = "817443+bradleyjs@users.noreply.github.com"
+#   singingkey = FF8657F6A86116D2
+
+[includeIf "gitdir:~/projects/slalom/"]
+    path = ~/.gitconfig-slalom
 
 [core]
   editor = emacsclient
@@ -10,7 +13,7 @@
   pager = cat  # turns off pager for all git commands; helpful for Emacs shell
 
 [commit]
-  gpgsign = true
+#  gpgsign = true
 
 [push]
   default = tracking

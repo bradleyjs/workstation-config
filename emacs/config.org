@@ -1,0 +1,181 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Bradley Strauss
+#+PROPERTY: header-args:emacs-lisp :tangle yes :results silent
+
+* General Settings
+** Interface & Defaults
+
+#+BEGIN_SRC emacs-lisp
+;; Disable UI Chrome (Redundant backup to early-init.el)
+(when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+
+;; Silence
+(setq ring-bell-function #'ignore)
+
+;; Display Info
+(column-number-mode t)
+(setq display-time-day-and-date t)
+(display-time-mode t)
+
+;; Safety: Require full "yes" or "no"
+(setq confirm-kill-emacs 'yes-or-no-p)
+
+;; Editing Visuals
+(show-paren-mode t)
+(setq show-paren-style 'expression)
+(setq js-indent-level 2)
+
+;; Auto-refresh buffers when files change on disk
+(global-auto-revert-mode t)
+#+END_SRC
+
+** Fonts & Themes
+#+BEGIN_SRC emacs-lisp
+(let ((font (cond ((eq system-type 'darwin) "Menlo 18")
+                  ((eq system-type 'gnu/linux) "6x13")
+                  (t "Monospace 12"))))
+  (set-face-attribute 'default nil :font font))
+#+END_SRC
+
+* Keybindings
+#+BEGIN_SRC emacs-lisp
+;; Window Management
+(global-set-key (kbd "<f8>") 'other-window)
+(global-set-key (kbd "<f9>") (lambda () (interactive) (other-window -1)))
+(global-set-key (kbd "<f6>") 'delete-window)
+
+;; Editing
+(global-set-key "\C-w" 'backward-kill-word)
+(global-set-key "\C-x\C-k" 'kill-region)
+(global-set-key "\C-c\C-k" 'kill-region)
+
+;; Commands
+(global-set-key "\C-x\C-m" 'execute-extended-command)
+(global-set-key "\C-c\C-m" 'execute-extended-command)
+
+;; Mouse
+(global-set-key (kbd "<s-M-wheel-up>") 'mouse-wheel-text-scale)
+(global-set-key (kbd "<s-M-wheel-down>") 'mouse-wheel-text-scale)
+#+END_SRC
+
+* Packages
+** Magit
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :ensure t
+  :bind (("C-x g" . magit-status)
+         ("C-c g" . magit-status)
+         ("C-x M-g" . magit-dispatch)
+         ("C-c C-g" . magit-dispatch)))
+#+END_SRC
+
+** Copilot
+#+BEGIN_SRC emacs-lisp
+(use-package copilot-chat
+  :ensure t
+  :custom
+  (copilot-chat-model "claude-sonnet-4"))
+#+END_SRC
+
+** VTerm (Terminal)
+#+BEGIN_SRC emacs-lisp
+(use-package vterm
+  :ensure t
+  :config
+  (setq vterm-max-scrollback 100000)
+  (setq vterm-kill-buffer-on-exit nil)
+
+  (add-hook 'vterm-exit-functions
+            (lambda (buffer _event)
+              (when (buffer-live-p buffer)
+                (with-current-buffer buffer
+                  (vterm-copy-mode 1)))))
+
+  (defun my/vterm-open-dired ()
+    (interactive)
+    (dired default-directory))
+
+  :bind (:map vterm-mode-map
+              ("C-c d" . my/vterm-open-dired)))
+#+END_SRC
+
+** LSP & Python
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-mode
+  :ensure t
+  :init (setq lsp-keymap-prefix "C-c l")
+  :hook ((python-mode . lsp)
+         (lsp-mode . lsp-enable-which-key-integration)))
+
+(use-package lsp-ui :ensure t)
+
+(use-package ein
+  :ensure t
+  :custom (ein:output-area-inlined-images t))
+#+END_SRC
+
+** Markdown
+#+BEGIN_SRC emacs-lisp
+(use-package markdown-mode
+  :ensure t
+  :mode ("\\.md\\'" "\\.markdown\\'"))
+#+END_SRC
+
+** Dired
+#+BEGIN_SRC emacs-lisp
+(use-package dired
+  :ensure nil
+  :hook (dired-load . (lambda () (require 'dired-x)))
+  :config
+  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+  (setq insert-directory-program "gls"))
+#+END_SRC
+
+* Org Mode
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :ensure nil
+  :config
+  ;; Visuals
+  (setq org-startup-indented nil)
+  (setq org-adapt-indentation t)
+  (setq org-level-color-stars-only t)
+  (setq org-src-fontify-natively t)
+  (setq org-src-tab-acts-natively t)
+
+  ;; Workflow
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+          (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
+  (setq org-use-fast-todo-selection t)
+  (setq org-log-done t)
+
+  ;; Custom Indent Behavior
+  (defun my/fix-org-indent-behavior ()
+    (electric-indent-local-mode -1)
+    (local-set-key (kbd "C-j") (lambda () (interactive) (org-return t)))
+    (visual-line-mode 1))
+  (add-hook 'org-mode-hook 'my/fix-org-indent-behavior)
+
+  ;; Babel
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)
+     (R . t)
+     (python . t)
+     (emacs-lisp . t)
+     (ditaa . t)
+     (makefile . t))))
+#+END_SRC
+
+** Latex / Auctex
+#+BEGIN_SRC emacs-lisp
+(use-package tex
+  :ensure auctex
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq TeX-electric-sub-and-superscript t)
+  (add-hook 'doc-view-mode-hook 'auto-revert-mode))
+#+END_SRC

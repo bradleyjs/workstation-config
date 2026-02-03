@@ -1,0 +1,81 @@
+#!/bin/zsh
+# ==============================================================================
+# WORKSTATION-CONFIG ZSHRC
+# Shared configuration usable across Work (Apple Silicon) and Home (Intel/Linux).
+# ==============================================================================
+
+# 1. ENVIRONMENT & PATHS
+# ------------------------------------------------------------------------------
+# Detect Homebrew path (Apple Silicon vs Intel/Linux)
+if [[ -f /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -f /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# Add user bin to path (prioritize local scripts)
+export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
+
+# 2. PYTHON (PYENV)
+# ------------------------------------------------------------------------------
+export PYENV_ROOT="$HOME/.pyenv"
+if [[ -d "$PYENV_ROOT/bin" ]]; then
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    if command -v pyenv 1>/dev/null 2>&1; then
+        eval "$(pyenv init -)"
+    fi
+fi
+
+# 3. DEV TOOLS (PUPPETEER)
+# ------------------------------------------------------------------------------
+# Note: This path is specific to Mac ARM architecture.
+# We use $HOME to make it portable between users, and check for existence
+# so it doesn't throw errors on your Intel/Linux machines.
+_PUPPETEER_PATH="$HOME/.cache/puppeteer/chrome-headless-shell/mac_arm-144.0.7559.96/chrome-headless-shell-mac-arm64/chrome-headless-shell"
+
+if [[ -f "$_PUPPETEER_PATH" ]]; then
+    export PUPPETEER_EXECUTABLE_PATH="$_PUPPETEER_PATH"
+fi
+
+# 4. EMACS VTERM INTEGRATION
+# ------------------------------------------------------------------------------
+# Fixes directory tracking (C-x C-f) and history inside Emacs vterm.
+if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
+    # Automatically find the sibling vterm.zsh file in this repo
+    # ${0:a:h} gets the absolute path of the directory containing this script
+    ZSH_CONFIG_DIR=${0:a:h}
+    if [[ -f "$ZSH_CONFIG_DIR/vterm.zsh" ]]; then
+        source "$ZSH_CONFIG_DIR/vterm.zsh"
+    fi
+fi
+
+# 5. ALIASES & UX
+# ------------------------------------------------------------------------------
+# Use GNU ls (gls) for colors if installed, otherwise fallback to BSD ls
+if command -v gls >/dev/null 2>&1; then
+    alias ls='gls --color=auto --group-directories-first'
+else
+    alias ls='ls --color=auto'
+fi
+
+alias ll='ls -l'
+alias la='ls -A'
+alias g='git'
+alias em='emacsclient -nw' # Quick open in terminal Emacs
+
+# 6. HISTORY CONFIG
+# ------------------------------------------------------------------------------
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=10000
+setopt APPEND_HISTORY
+setopt EXTENDED_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_DUPS
+setopt SHARE_HISTORY
+
+# 7. LOCAL OVERRIDES (Secrets & Tokens)
+# ------------------------------------------------------------------------------
+# Load machine-specific secrets that should NOT be committed to git.
+# Create this file on each machine for API keys (OpenAI, AWS, etc).
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

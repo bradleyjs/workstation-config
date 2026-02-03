@@ -1,4 +1,4 @@
 [user]
-    email = "bradley.strauss@slalom.com"
+    email = ""
     name = "Bradley Strauss"
-#    signingkey = WORK_GPG_KEY_ID  # Optional: specific key for work
+#   signingkey = WORK_GPG_KEY_ID  # Optional: specific key for work

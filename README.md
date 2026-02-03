@@ -50,24 +50,24 @@ the root of the repository:
 ### 1. Emacs (`emacs/`)
 The Emacs setup has been modernized to use a **literate configuration** workflow.
 
-* **`config.org`**: This is the main configuration file. It is an Org Mode file
+* **`config.org`**: This is the main configuration file. It is an org mode file
   containing code blocks for packages, keybindings, and settings. **Make all
   edits here.**
 * **`init.el`**: You do *not* need to touch this. It simply bootstraps
   `use-package` and loads `config.org`.
-* **Drift Prevention**: You do not need to manually tangle the Org
-  file. `init.el` reads the Org file directly on startup.
+* **Drift Prevention**: You do not need to manually tangle the org
+  file. `init.el` reads the org file directly on startup.
 
-### 2. Zsh (`zsh/`)
+### 2. zsh (`zsh/`)
 The shell configuration is designed to be shared across multiple machines while
 keeping secrets local.
 
-* **`zsh/zshrc`**: The shared template. It handles paths, aliases, Pyenv, and
+* **`zsh/zshrc`**: The shared template. It handles paths, aliases, pyenv, and
   Puppeteer detection automatically.
 * **`~/.zshrc.local`**: The installation script ensures this file exists on your
-  machine. **Put API keys, tokens, and machine-specific env vars here.** This
-  file is ignored by git.
-* **VTerm support**: The config automatically detects if it is running inside
+  machine. Put API keys, tokens, and machine-specific env vars here. This file
+  resides outside the repository and will never be tracked by version control.
+* **vterm support**: The config automatically detects if it is running inside
   Emacs (`vterm`) and loads `vterm.zsh` to enable directory tracking (`C-x C-f`)
   and prompt integration.
 

@@ -36,6 +36,10 @@ if [ -f "$HOME/.emacs" ]; then
     backup_path "$HOME/.emacs" "LEGACY"
 fi
 
+# Create Emacs cache directories (keeps repo clean)
+EMACS_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/emacs"
+mkdir -p "$EMACS_CACHE_DIR"/{elpa,auto-save,auto-save-list,backup}
+
 # Handle ~/.emacs.d directory
 TARGET_EMACS_DIR="$REPO_DIR/emacs"
 LINK_NAME="$HOME/.emacs.d"

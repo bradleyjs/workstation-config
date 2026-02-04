@@ -1,0 +1,7 @@
+# Safety net: ignore any generated artifacts that accidentally land in the repo.
+elpa/
+auto-save-list/
+auto-save/
+backup/
+custom.el
+transient/

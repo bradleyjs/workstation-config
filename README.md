@@ -28,6 +28,19 @@ professional workstations. It prioritizes:
 └── install.sh          # Setup script (Run this to deploy)
 ```
 
+## Prerequisites
+
+**Required**
+* **Emacs 27+** (uses `early-init.el`).
+* **git** (to clone and update the repo).
+* **zsh** (the shell configuration assumes zsh).
+
+**Recommended / Optional**
+* **Homebrew** on macOS (or your Linux package manager) for dependencies.
+* **coreutils** (for `gls`) to enable GNU-style `ls` behavior and Dired support.
+* **pyenv** if you want the Python setup to take effect.
+* **libvterm** if you use the Emacs `vterm` package (required to build the module).
+
 ## Quick Start (Installation)
 
 To set up a new machine (or update an existing one), run the install script from
@@ -44,6 +57,8 @@ the root of the repository:
 3.  **Appends** a source command to `~/.zshrc` to load the repo's shell config
     (preserving any local edits).
 4.  **Checks** for `~/.zshrc.local` and creates it if missing (for secrets).
+5.  **Creates** Emacs cache directories under `~/.cache/emacs` (or
+    `$XDG_CACHE_HOME/emacs`) for packages, autosaves, and backups.
 
 ## Configuration Guide
 
@@ -55,6 +70,11 @@ The Emacs setup has been modernized to use a **literate configuration** workflow
   edits here.**
 * **`init.el`**: You do *not* need to touch this. It simply bootstraps
   `use-package` and loads `config.org`.
+* **Cache separation**: Generated files (packages, autosaves, backups, and
+  `custom.el`) are written to `~/.cache/emacs/` (or `$XDG_CACHE_HOME/emacs`) to
+  keep the repo clean while preserving the “init in repo” pattern.
+* **Safety net**: `emacs/.gitignore` ignores common generated artifacts in case
+  anything lands in the repo.
 * **Drift Prevention**: You do not need to manually tangle the org
   file. `init.el` reads the org file directly on startup.
 
@@ -62,8 +82,7 @@ The Emacs setup has been modernized to use a **literate configuration** workflow
 The shell configuration is designed to be shared across multiple machines while
 keeping secrets local.
 
-* **`zsh/zshrc`**: The shared template. It handles paths, aliases, pyenv, and
-  Puppeteer detection automatically.
+* **`zsh/zshrc`**: The shared template. It handles paths, aliases, and pyenv.
 * **`~/.zshrc.local`**: The installation script ensures this file exists on your
   machine. Put API keys, tokens, and machine-specific env vars here. This file
   resides outside the repository and will never be tracked by version control.

@@ -26,18 +26,7 @@ if [[ -d "$PYENV_ROOT/bin" ]]; then
     fi
 fi
 
-# 3. DEV TOOLS (PUPPETEER)
-# ------------------------------------------------------------------------------
-# Note: This path is specific to Mac ARM architecture.
-# We use $HOME to make it portable between users, and check for existence
-# so it doesn't throw errors on your Intel/Linux machines.
-_PUPPETEER_PATH="$HOME/.cache/puppeteer/chrome-headless-shell/mac_arm-144.0.7559.96/chrome-headless-shell-mac-arm64/chrome-headless-shell"
-
-if [[ -f "$_PUPPETEER_PATH" ]]; then
-    export PUPPETEER_EXECUTABLE_PATH="$_PUPPETEER_PATH"
-fi
-
-# 4. EMACS VTERM INTEGRATION
+# 3. EMACS VTERM INTEGRATION
 # ------------------------------------------------------------------------------
 # Fixes directory tracking (C-x C-f) and history inside Emacs vterm.
 if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
@@ -49,13 +38,17 @@ if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
     fi
 fi
 
-# 5. ALIASES & UX
+# 4. ALIASES & UX
 # ------------------------------------------------------------------------------
 # Use GNU ls (gls) for colors if installed, otherwise fallback to BSD ls
 if command -v gls >/dev/null 2>&1; then
     alias ls='gls --color=auto --group-directories-first'
 else
-    alias ls='ls --color=auto'
+    if [[ "$OSTYPE" == darwin* ]]; then
+        alias ls='ls -G'
+    else
+        alias ls='ls --color=auto'
+    fi
 fi
 
 alias ll='ls -l'
@@ -63,7 +56,7 @@ alias la='ls -A'
 alias g='git'
 alias em='emacsclient -nw' # Quick open in terminal Emacs
 
-# 6. HISTORY CONFIG
+# 5. HISTORY CONFIG
 # ------------------------------------------------------------------------------
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=50000
@@ -74,7 +67,7 @@ setopt HIST_EXPIRE_DUPS_FIRST
 setopt HIST_IGNORE_DUPS
 setopt SHARE_HISTORY
 
-# 7. LOCAL OVERRIDES (Secrets & Tokens)
+# 6. LOCAL OVERRIDES (Secrets & Tokens)
 # ------------------------------------------------------------------------------
 # Load machine-specific secrets that should NOT be committed to git.
 # Create this file on each machine for API keys (OpenAI, AWS, etc).

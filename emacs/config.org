@@ -129,7 +129,9 @@
   :hook (dired-load . (lambda () (require 'dired-x)))
   :config
   (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
-  (setq insert-directory-program "gls"))
+  ;; On macOS, `gls` comes from coreutils (install via Homebrew).
+  (setq insert-directory-program
+        (if (executable-find "gls") "gls" "ls")))
 #+END_SRC
 
 * Org Mode

@@ -37,7 +37,8 @@ professional workstations. It prioritizes:
 
 **Recommended / Optional**
 * **Homebrew** on macOS (or your Linux package manager) for dependencies.
-* **coreutils** (for `gls`) to enable GNU-style `ls` behavior and Dired support.
+* **coreutils** (for `gls`) to enable GNU-style `ls` behavior and Dired support
+  on macOS (install via Homebrew).
 * **pyenv** if you want the Python setup to take effect.
 * **libvterm** if you use the Emacs `vterm` package (required to build the module).
 

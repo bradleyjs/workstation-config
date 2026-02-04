@@ -6,10 +6,37 @@ set -e # Exit immediately if a command exits with a non-zero status
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP_DIR="$HOME/config_backups_$(date +%Y%m%d_%H%M%S)"
 ZSHRC_TEMPLATE="$REPO_DIR/zsh/zshrc"
+RUN_OSX=false
+OS_NAME="$(uname -s)"
+
+# 2. ARGUMENTS
+# ------------------------------------------------------------------------------
+usage() {
+    echo "Usage: $0 [--osx]"
+    echo "  --osx   Run macOS defaults scripts (fails on non-macOS)."
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --osx)
+            RUN_OSX=true
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
 
 echo ">> Setting up workstation-config from: $REPO_DIR"
 
-# 2. HELPER FUNCTIONS
+# 3. HELPER FUNCTIONS
 # ------------------------------------------------------------------------------
 backup_path() {
     local path="$1"
@@ -27,7 +54,7 @@ backup_path() {
     return 0
 }
 
-# 3. SETUP EMACS
+# 4. SETUP EMACS
 # ------------------------------------------------------------------------------
 echo ">> Configuring Emacs..."
 
@@ -49,7 +76,7 @@ if backup_path "$LINK_NAME" "$TARGET_EMACS_DIR"; then
     ln -s "$TARGET_EMACS_DIR" "$LINK_NAME"
 fi
 
-# 4. SETUP ZSH
+# 5. SETUP ZSH
 # ------------------------------------------------------------------------------
 echo ">> Configuring Zsh..."
 
@@ -81,7 +108,23 @@ else
     fi
 fi
 
-# 5. FINISH
+# 6. OPTIONAL: macOS DEFAULTS
+# ------------------------------------------------------------------------------
+if [[ "$RUN_OSX" = true ]]; then
+    if [[ "$OS_NAME" != "Darwin" ]]; then
+        echo ">> [ERROR] --osx requested, but OS is $OS_NAME. Aborting." >&2
+        exit 1
+    fi
+    echo ">> Applying macOS defaults..."
+    for script in "$REPO_DIR"/osx/*.sh; do
+        if [[ -f "$script" ]]; then
+            echo "   [RUN] $(basename "$script")"
+            "$script"
+        fi
+    done
+fi
+
+# 7. FINISH
 # ------------------------------------------------------------------------------
 echo ">> Done!"
 if [ -d "$BACKUP_DIR" ]; then

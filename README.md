@@ -48,8 +48,16 @@ To set up a new machine (or update an existing one), run the install script from
 the root of the repository:
 
 ```bash
-./install.sh
+bash install.sh
 ```
+
+Optional (macOS only):
+
+```bash
+bash install.sh --osx
+```
+
+Note: `--osx` will exit with an error if run on non-macOS systems.
 
 **What this script does:**
 1.  **Backs up** any existing configuration files (e.g., `~/.zshrc`,
@@ -60,6 +68,8 @@ the root of the repository:
 4.  **Checks** for `~/.zshrc.local` and creates it if missing (for secrets).
 5.  **Creates** Emacs cache directories under `~/.cache/emacs` (or
     `$XDG_CACHE_HOME/emacs`) for packages, autosaves, and backups.
+6.  **(Optional)** If `--osx` is provided, runs scripts in `osx/` to apply
+    macOS defaults (e.g., Finder hidden files, Calendar event duration).
 
 ## Configuration Guide
 
